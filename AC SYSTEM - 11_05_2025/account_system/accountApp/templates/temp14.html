@@ -1,0 +1,821 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp14 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guests Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: url("{% static 'Picture1.png' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+        }
+
+        .header.hidden {
+            display: none;
+        }
+
+        .logo {
+            width: 150px;
+            height: 40px;
+            background-color: #ddd; /* Placeholder for logo */
+            /* border-radius: 50%; */
+            margin-left: 20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .header-btn:hover {
+            background: #0056b3;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .split {
+            width: 50%;
+            overflow-y: auto;
+        }
+
+        .left {
+            padding: 20px;
+            background-color: rgba(44, 62, 80, 0.9);
+            color: #ecf0f1;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .right {
+            padding: 20px;
+            background: linear-gradient(145deg, #e3f2fd, #ffffff);
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+            color: #2c3e50;
+            border-radius: 10px;
+            margin: 10px;
+        }
+
+        .buyer-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .buyer-list li {
+            margin: 10px 0;
+            cursor: pointer;
+            color: #1abc9c;
+            padding: 10px;
+            background-color: #34495e;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .buyer-list li:hover {
+            background-color: #1abc9c;
+            color: #2c3e50;
+            transition: 0.3s;
+        }
+
+        .buyer-details, .buyer-bills {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        p {
+            margin: 5px 0;
+            padding: 5px;
+            background: #e8f5e9;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            color: #000000;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .modal-close {
+            background: #6c757d;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="{% static '2.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="header-buttons">
+            <button class="header-btn" onclick="history.back()">Back</button>
+            <button class="header-btn" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+        </div>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show right-alert" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="split left">
+        <h2 style="color: #ffffff;">Guests</h2>
+        <ul class="buyerList" id="buyerList">
+            <!-- Guests will be listed dynamically -->
+        </ul>
+    </div>
+    <div class="split right">
+        <div class="guest-details">
+            <h2>Guest Details</h2>
+            <p><strong>Guest No:</strong> <span id="guestNo">-</span></p>
+            <p><strong>Guest Name:</strong> <span id="guestName">-</span></p>
+            <p><strong>Mobile No:</strong> <span id="guestMobile">-</span></p>
+            <p><strong>Email:</strong> <span id="guestEmail">-</span></p>
+            <p><strong>Firm Name:</strong> <span id="firmName">-</span></p>
+            <p><strong>Firm Address:</strong> <span id="firmAddress">-</span></p>
+            <p><strong>GST No:</strong> <span id="firmGST">-</span></p>
+        </div>
+        <div class="guest-bills">
+            <h2>Guest Bills</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Date</th>
+                        <th>Material</th>
+                        <th>Material Qty</th>
+                        <th>Material Amount</th>
+                        <th>Bill Amount</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="billsTable">
+                    <tr>
+                        <td colspan="6" class="no-data">No bills available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Bill Details -->
+    <div class="modal" id="billModal">
+        <div class="modal-content">
+            <h2>Bill Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Payment Type</th>
+                        <th>Payment No</th>
+                        <th>Advance Amount</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody id="billDetailsTable">
+                    <!-- Details will be populated dynamically -->
+                </tbody>
+            </table>
+            <p style="color: #000055;"><strong>Remaining Amount:</strong> <span id="remainingAmount">$0</span></p>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!--
+    <script>
+        const guests = JSON.parse("{{guests|escapejs}}")
+
+        console.log(guests);
+
+        const guestList = document.getElementById('guestList');
+        const guestNo = document.getElementById('guestNo');
+        const guestName = document.getElementById('guestName');
+        const guestMobile = document.getElementById('guestMobile');
+        const guestEmail = document.getElementById('guestEmail');
+const firmName = document.getElementById('firmName');
+const firmAddress = document.getElementById('firmAddress');
+const firmGST = document.getElementById('firmGST');
+const billsTable = document.getElementById('billsTable');
+const billModal = document.getElementById('billModal');
+const billDetailsTable = document.getElementById('billDetailsTable');
+const remainingAmount = document.getElementById('remainingAmount');
+
+// Populate the guest list
+guests.forEach(guest => {
+    const li = document.createElement('li');
+    li.textContent = guest.firstname + " " + guest.lastname;
+    li.onclick = () => displayGuestDetails(guest);
+    guestList.appendChild(li);
+});
+
+// Display guest details
+function displayGuestDetails(guest) {
+    gusetNo.textContent = guest.id;
+    guestName.textContent = guest.firstname + " " + guest.lastname;
+    guestMobile.textContent = guest.mobile_no;
+    guestEmail.textContent = guest.email;
+    firmName.textContent = guest.firm_name;
+    firmAddress.textContent = guest.firm_address;
+    firmGST.textContent = guest.firm_gst_no;
+
+    // Populate bills table
+    billsTable.innerHTML = '';
+            const row = document.createElement('tr');
+
+            // Generate Material Names
+            let materialNames = '';
+            let materialQtys = '';
+            let materialAmounts = '';
+
+            guest.materials.forEach(mat => {
+                materialNames += `<div>${mat.material_name}</div>`;
+                materialQtys += `<div>${mat.material_qty}</div>`;
+                materialAmounts += `<div>${mat.amount.toFixed(2)}</div>`;
+            });
+
+
+            row.innerHTML = `
+                <td><a href="#" onclick="showBillDetails(${guest.id})">${guest.id}</a></td>
+                <td>${guest.date}</td>
+                <td>${materialNames}</td>
+                <td>${materialQtys}</td>
+                <td>${materialAmounts}</td>
+                <td>${guest.bill_amount}</td>
+                <td>${guset.note}</td>
+            `;
+            billsTable.appendChild(row);
+}
+
+// Show modal with bill details
+function showBillDetails(billNo) {
+
+    const vendor = vendors.find(b => b.id === vendorId);
+    const bill = vendor.bills.find(b => b.id === billNo);
+
+    if (bill) {
+        billDetailsTable.innerHTML = '';
+        let totalAdvance = 0;
+
+        bill.details.forEach(detail => {
+            totalAdvance += detail.adv_amount;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><a href="#"
+                     data-vendor-id="${vendor.id}"
+                     data-bill-id="${bill.id}"
+                     data-detail-id="${detail.id}"
+                     onclick="printReceiptById(this)">
+                     ${detail.id}
+                </a></td>
+                <td>${detail.date}</td>
+                <td>${detail.type}</td>
+                <td>${detail.type_no}</td>
+                <td>${detail.adv_amount}</td>
+                <td>${detail.note}</td>
+            `;
+            billDetailsTable.appendChild(row);
+        });
+
+        const remaining = bill.bill_amount - totalAdvance;
+        remainingAmount.textContent = `$${remaining.toFixed(2)}`;
+        billModal.style.display = 'flex';
+    }
+}
+
+// Close the modal
+function closeModal() {
+    billModal.style.display = 'none';
+}
+
+
+function printReceiptById(link) {
+    const vendorId = parseInt(link.getAttribute('data-vendor-id'));
+    const billId = parseInt(link.getAttribute('data-bill-id'));
+    const detailId = parseInt(link.getAttribute('data-detail-id'));
+
+    const vendor = vendors.find(v => v.id === vendorId);
+    const bill = vendor.bills.find(b => b.id === billId);
+    const detail = bill.details.find(d => d.id === detailId);
+
+    printBill(vendor, bill, detail);
+}
+
+
+
+
+function printBill(vendor, bill) {
+    const vendorName = `${vendor.firstname} ${vendor.lastname}`;
+    const firmName = vendor.firm_name;
+    const firmAddress = vendor.firm_address;
+    const firmGst = vendor.firm_gst_no;
+
+    let materialsHtml = '';
+    let totalAmount = 0;
+
+    bill.materials.forEach((material, index) => {
+        totalAmount += material.amount;
+        materialsHtml += `
+            <tr>
+                <td class="align-center">${index + 1}</td>
+                <td>${material.material_name}</td>
+                <td class="align-center">${material.hsn_code || '-'}</td>
+                <td class="align-center">${material.material_qty}</td>
+                <td class="align-right">${parseFloat(material.amount / material.material_qty).toFixed(2)}</td>
+                <td class="align-right">${parseFloat(material.amount).toFixed(2)}</td>
+            </tr>
+        `;
+    });
+
+    const cgst = totalAmount * 0.09;
+    const sgst = totalAmount * 0.09;
+    const totalTax = cgst + sgst;
+    const grandTotal = totalAmount + totalTax;
+
+    const receiptHtml = `
+    <html>
+    <head>
+        <title>Invoice - Shree Sai Vaibhav Traders</title>
+        <style>
+            body { font-family: 'Arial', sans-serif; font-size: 13px; margin: 40px; background: #fff; }
+            .invoice-box { max-width: 950px; margin: auto; padding: 20px; border: 2px solid black; }
+            .title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 4px; }
+            .subtitle { text-align: center; font-size: 14px; margin-bottom: 2px; }
+            .subsubtitle { text-align: center; font-size: 12px; margin-bottom: 10px; }
+            hr { border: 1px solid black; margin-top: 10px; margin-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; }
+            td, th { padding: 6px; border: 1px solid black; vertical-align: top; }
+            .no-border { border: none; }
+            .align-right { text-align: right; }
+            .align-center { text-align: center; }
+            .section-title { background: #f0f0f0; font-weight: bold; }
+            .signature { text-align: right; margin-top: 50px; }
+            .small-text { font-size: 11px; }
+        </style>
+    </head>
+    <body>
+
+    <div class="invoice-box">
+        <div class="title">M/S. SHREE SAI VAIBHAV TRADERS</div>
+        <div class="subtitle">ALL KINDS OF STEEL, PROFILE SHEET, JSW STEEL, CEMENT</div>
+        <div class="subsubtitle">Plot No. C-6A, C-7A, Udyamnagar, Tal. Kudal, Dist. Sindhudurg</div>
+        <div class="subsubtitle">Phone: (02362) 221111, 222291 | Mob: 9421065336, 9422381424 | Email: saivaibhav89@gmail.com</div>
+        <div class="subsubtitle">GSTIN: 27BVEP8760L1ZU</div>
+
+        <hr>
+
+        <table>
+            <tr>
+                <td><b>Invoice No:</b> ${bill.id}</td>
+                <td><b>Transport Mode:</b> Road</td>
+            </tr>
+            <tr>
+                <td><b>Invoice Date:</b> ${bill.date}</td>
+                <td><b>Vehicle Number:</b> ___________</td>
+            </tr>
+            <tr>
+                <td><b>Reverse Charge (Y/N):</b> N</td>
+                <td><b>Date of Supply:</b> ${bill.date}</td>
+            </tr>
+            <tr>
+                <td><b>State:</b> Maharashtra</td>
+                <td><b>Place of Supply:</b> Kudal</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table>
+            <tr class="section-title">
+                <th>Bill to Party</th>
+                <th>Ship to Party</th>
+            </tr>
+            <tr>
+                <td>
+                    <b>${vendorName}</b><br>
+                    ${firmName}<br>
+                    ${firmAddress}<br>
+                    GSTIN: ${firmGst || '-'}
+                </td>
+                <td>Same as Bill to</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table>
+            <tr class="section-title">
+                <th>No.</th>
+                <th>Product Description</th>
+                <th>HSN Code</th>
+                <th>Qty.</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+            ${materialsHtml}
+        </table>
+
+        <br>
+
+        <table>
+            <tr>
+                <td class="no-border" colspan="4"></td>
+                <td><b>Total</b></td>
+                <td class="align-right"><b>${totalAmount.toFixed(2)}</b></td>
+            </tr>
+            <tr>
+                <td class="no-border" colspan="4"></td>
+                <td>Add: CGST @ 9%</td>
+                <td class="align-right">${cgst.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="no-border" colspan="4"></td>
+                <td>Add: SGST @ 9%</td>
+                <td class="align-right">${sgst.toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td class="no-border" colspan="4"></td>
+                <td><b>Total Tax Amount</b></td>
+                <td class="align-right"><b>${totalTax.toFixed(2)}</b></td>
+            </tr>
+            <tr>
+                <td class="no-border" colspan="4"></td>
+                <td><b>Total Amount After Tax</b></td>
+                <td class="align-right"><b>${grandTotal.toFixed(2)}</b></td>
+            </tr>
+        </table>
+
+        <br>
+
+        <b>Total Invoice Amount in Words:</b> ₹ _________ Only
+
+        <br><br>
+
+        <table>
+            <tr>
+                <td><b>Gross Weight:</b> ___________</td>
+                <td><b>Tare Weight:</b> ___________</td>
+                <td><b>Net Weight:</b> ___________</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <table>
+            <tr class="section-title">
+                <th colspan="2">Bank Details</th>
+            </tr>
+            <tr>
+                <td><b>Name of Bank:</b> Bank of India, Pinguli</td>
+                <td><b>IFSC:</b> BKID0001408</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Bank Account Number:</b> 140830110000070</td>
+            </tr>
+        </table>
+
+        <br>
+
+        <b>Declaration:</b><br>
+        <div class="small-text">
+            We declare that this invoice shows the actual price of goods described and that all particulars are true and correct.
+        </div>
+
+        <div class="signature">
+            For M/S. SHREE SAI VAIBHAV TRADERS<br><br><br>
+            _____________________<br>
+            Proprietor
+        </div>
+
+    </div>
+
+    </body>
+    </html>
+    `;
+
+    const printWindow = window.open('', '_blank', 'width=950,height=650');
+    printWindow.document.write(receiptHtml);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.onload = function () {
+        printWindow.print();
+    };
+}
+
+
+
+
+window.onclick = function(event) {
+        const modal = document.getElementById('billModal');
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+</script>-->
+
+
+<script>
+    const bills = JSON.parse("{{guests|escapejs}}");
+    console.log(bills);
+
+    const buyerList = document.getElementById('buyerList');
+    const buyerNo = document.getElementById('guestNo');
+    const buyerName = document.getElementById('guestName');
+    const buyerMobile = document.getElementById('guestMobile');
+    const buyerEmail = document.getElementById('guestEmail');
+    const firmName = document.getElementById('firmName');
+    const firmAddress = document.getElementById('firmAddress');
+    const firmGST = document.getElementById('firmGST');
+    const billsTable = document.getElementById('billsTable');
+    const billModal = document.getElementById('billModal');
+    const billDetailsTable = document.getElementById('billDetailsTable');
+    const remainingAmount = document.getElementById('remainingAmount');
+
+    // Extract unique buyers
+    const buyersMap = {};
+    bills.forEach(bill => {
+        if (!buyersMap[bill.buyer_name]) {
+            buyersMap[bill.buyer_name] = [];
+        }
+        buyersMap[bill.buyer_name].push(bill);
+    });
+
+    // Populate buyer list
+    Object.keys(buyersMap).forEach((buyerName, index) => {
+        const li = document.createElement('li');
+        li.textContent = buyerName;
+        li.onclick = () => displayBuyerDetails(buyerName);
+        buyerList.appendChild(li);
+    });
+
+    function displayBuyerDetails(buyerNameKey) {
+        const buyerBills = buyersMap[buyerNameKey];
+        const firstBill = buyerBills[0];
+
+        buyerNo.textContent = "-";
+        buyerName.textContent = buyerNameKey;
+        buyerMobile.textContent = "-";
+        buyerEmail.textContent = "-";
+        firmName.textContent = "-";
+        firmAddress.textContent = "-";
+        firmGST.textContent = "-";
+
+        billsTable.innerHTML = '';
+        buyerBills.forEach(bill => {
+            const row = document.createElement('tr');
+
+            let materialNames = '';
+            let materialQtys = '';
+            let materialAmounts = '';
+
+            bill.materials.forEach(mat => {
+                materialNames += `<div>${mat.material_name}</div>`;
+                materialQtys += `<div>${parseFloat(mat.material_qty).toFixed(3)}</div>`;
+                materialAmounts += `<div>₹${mat.amount.toFixed(2)}</div>`;
+            });
+
+            row.innerHTML = `
+                <td><a href="#" onclick="showBillDetails(${bill.id})">${bill.id}</a></td>
+                <td>${bill.date.split("T")[0]}</td>
+                <td>${materialNames}</td>
+                <td>${materialQtys}</td>
+                <td>${materialAmounts}</td>
+                <td>₹${parseFloat(bill.grand_total).toFixed(2)}</td>
+                <td>${bill.note || ''}</td>
+            `;
+            billsTable.appendChild(row);
+        });
+    }
+
+    function showBillDetails(billId) {
+        const bill = bills.find(b => b.id === billId);
+        if (!bill) return;
+
+        billDetailsTable.innerHTML = '';
+        let totalAdvance = 0;
+
+        if (bill.details && bill.details.length > 0) {
+            bill.details.forEach(detail => {
+                totalAdvance += detail.adv_amount;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="#"
+                        data-bill-id="${bill.id}"
+                        data-detail-id="${detail.id}"
+                        onclick="printReceiptById(this)">
+                        ${detail.id}</a></td>
+                    <td>${detail.date}</td>
+                    <td>${detail.type}</td>
+                    <td>${detail.type_no}</td>
+                    <td>₹${parseFloat(detail.adv_amount).toFixed(2)}</td>
+                    <td>${detail.note}</td>
+                `;
+                billDetailsTable.appendChild(row);
+            });
+        } else {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6">No advance/payment details available</td>`;
+            billDetailsTable.appendChild(row);
+        }
+
+        const remaining = bill.grand_total - totalAdvance;
+        remainingAmount.textContent = `₹${remaining.toFixed(2)}`;
+        billModal.style.display = 'flex';
+    }
+
+    // Close the modal
+    function closeModal() {
+        billModal.style.display = 'none';
+    }
+
+    function printReceiptById(link) {
+        const billId = parseInt(link.getAttribute('data-bill-id'));
+        const detailId = parseInt(link.getAttribute('data-detail-id'));
+        const bill = bills.find(b => b.id === billId);
+        const detail = bill.details.find(d => d.id === detailId);
+        printReceipt(bill, detail);
+    }
+
+    function printReceipt(bill, advDetail = null) {
+        const buyerName = bill.buyer_name;
+        const billNo = bill.id;
+        const billDate = bill.date.split("T")[0];
+        const amount = bill.bill_amount;
+
+        const detail = advDetail || {
+            type: 'N/A',
+            type_no: 'N/A',
+            adv_amount: 0,
+            date: 'N/A',
+            note: '',
+        };
+
+        const receiptHtml = `
+        <html>
+        <head>
+            <title>Receipt - Shree Sai Vaibhav Traders</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .subsubtitle { text-align: center; font-size: 12px; margin-bottom: 10px; }
+                .receipt { width: 800px; border: 2px solid #000; padding: 20px; box-sizing: border-box; }
+                .header { text-align: center; font-weight: bold; font-size: 20px; }
+                .sub-header { text-align: center; font-size: 14px; margin-bottom: 20px; }
+                .bold { font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                td { padding: 5px; border: 1px solid black; vertical-align: top; }
+                .no-border { border: none; }
+                .bottom-sign { text-align: right; font-weight: bold; margin-top: 40px; }
+            </style>
+        </head>
+        <body>
+            <div class="receipt">
+                <div class="header">Shree Sai Vaibhav Traders</div>
+                <div class="sub-header">
+                    Plot no. C-6A, C-7A, Udyamnagar, Tal - Kudal, Dist - Sindhudurg<br>
+                    Mob: 9421063536 / 9422381424
+                </div>
+                <table>
+                    <tr><td class="bold">NO:</td><td>${billNo}</td>
+                        <td class="bold">DATE:</td><td>${billDate}</td></tr>
+                </table>
+                <table>
+                    <tr><td colspan="4" class="no-border bold">RECEIVED with thanks from: <span style="font-weight: normal;">${buyerName}</span></td></tr>
+                    <tr><td colspan="4" class="no-border bold">The sum of Rs.: <span style="font-weight: normal;">${parseFloat(detail.adv_amount.toLocaleString()).toFixed(2)} /-</span></td></tr>
+                    <tr><td colspan="4" class="no-border bold">
+                        by <span style="font-weight: normal;">${detail.type}</span> No. <span style="font-weight: normal;">${detail.type_no}</span>
+                        Dated <span style="font-weight: normal;">${detail.date}</span> against the part / advance / full payments of our Bill No. <span style="font-weight: normal;">${billNo}</span>
+                    </td></tr>
+                </table>
+                <div class="bold" style="margin-top: 20px;">DETAILS OF D.D. AND CHEQUES</div>
+                <table>
+                    <tr>
+                        <td class="bold">Cheque No.</td><td>${detail.type_no || 'N/A'}</td>
+                        <td class="bold">Date</td><td>${detail.date}</td>
+                    </tr>
+                    <tr>
+                        <td class="bold">Bank</td><td colspan="3">${detail.note || 'N/A'}</td>
+                    </tr>
+                </table>
+                <div class="bottom-sign">For Shree Sai Vaibhav Traders</div>
+                <br><br><div class="subsubtitle">Software Created By Neha Sawant Mob: 7045517881 Email: nehasawant.9920@gmail.com</div>
+            </div>
+        </body>
+        </html>`;
+
+        const printWindow = window.open('', '_blank', 'width=850,height=650');
+        printWindow.document.write(receiptHtml);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.onload = function () {
+            printWindow.print();
+        };
+    }
+
+    window.onclick = function(event) {
+        if (event.target === billModal) {
+            billModal.style.display = "none";
+        }
+    };
+</script>
+
+</body>
+</html>

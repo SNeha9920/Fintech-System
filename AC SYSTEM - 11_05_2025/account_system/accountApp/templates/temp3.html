@@ -1,0 +1,600 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp3 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Details and Billing</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("{% static 'Picture2.png' %}"); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .buyer-details-container,
+        .billing-blocks-container,
+        .form-section-container {
+            margin: 30px 30px 30px 30px;
+            padding: 15px;
+            background: rgba(245, 245, 245, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .buyer-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+
+        .buyer-details div {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .billing-blocks {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .billing-block {
+            background: linear-gradient(135deg, #007bff, #66aaff);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .billing-block span {
+            font-weight: bold;
+            font-size: 28px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-section .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #007bff;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: none;
+        }
+
+        .form-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-buttons button:hover {
+            background: #0056b3;
+        }
+
+        .form-buttons .clear-btn {
+            background: #6c757d;
+        }
+
+        .form-buttons .clear-btn:hover {
+            background: #494f54;
+        }
+
+        .popover {
+            z-index: 1050 !important;
+        }
+
+        .form-section-container {
+            overflow: visible; /* Ensure the popover isn't clipped */
+        }
+
+        .material-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            margin-top: 1rem;
+            flex-wrap: wrap; /* optional for small screens */
+        }
+
+        .material-row .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .material-row .form-group input,
+        .material-row .form-group select {
+            height: 40px;
+            font-size: 16px;
+            padding: 5px 10px;
+            width: 100%;
+        }
+
+        .material-row .form-group button {
+            height: 40px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .btn-close {
+            background: #ffc107 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='black' class='bi bi-x' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") center/1em auto no-repeat;
+            border: none;
+            width: 1em;
+            height: 1em;
+            opacity: 0.6;
+            cursor: pointer;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-light" style="background: rgba(255, 255, 255, 0.9); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <a class="navbar-brand" href="#">
+        <img src="{% static '2.png' %}" width="150" height="40" alt="Sai Vaibhav Traders Logo" style="margin-left:20px">
+      </a>
+      <form class="form-inline">
+        <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="history.back()">Back</button>
+        <button type="button" class="btn btn-light" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+      </form>
+    </nav>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show right-alert" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    
+        <div class="buyer-details-container">
+            <div class="buyer-details">
+                <div>Buyer No: {{ data.id }}</div>
+                <div>Buyer Name: {{ data.firstname }} {{ data.lastname }} {{ data.guest_name }}</div>
+                <div>Buyer Mobile No: {{ data.mobile_no }}</div>
+                <div>Buyer Email: {{ data.email }}</div>
+                <div>Firm Name: {{ data.firm_name }}</div>
+                <div>Firm Address: {{ data.firm_address }}</div>
+                <div>Firm GST No: {{ data.firm_gst_no }}</div>
+            </div>
+        </div>
+
+        <div class="billing-blocks-container">
+            <div class="billing-blocks">
+                <div class="billing-block">
+                    Bill Amount
+                    <span id="billAmount">₹{{ mid_data.bill|floatformat:2 }}</span>
+                </div>
+                <div class="billing-block">
+                    Advance
+                    <span id="advanceAmount">₹{{ mid_data.adv|floatformat:2 }}</span>
+                </div>
+                <div class="billing-block">
+                    Remaining Amount
+                    <span id="remainingAmount">₹{{ mid_data.rem|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <form id="billingForm" action="{% url 'buyer_billing' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-section-container">
+        <div class="form-section">
+    <input type="hidden" name="buyer_details_billing" value="{{ data.id }}">
+    {% if data.guest_name %}
+            <input type="hidden" name="buyer_name" value="{{ data.guest_name }}">
+    {% endif %}
+
+    <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+    </div>
+
+
+    <div class="material-row">
+        <div class="form-group">
+            <label for="material_qty">Material Qty:</label>
+            <input type="number" id="material_qty" min="1" step="0.001">
+        </div>
+
+        <div class="form-group">
+            <label for="buyer_material_billing">Material:</label>
+            <select id="buyer_material_billing" data-toggle="popover">
+                {% for material in materials %}
+                <option value="{{ material.id }}">{{ material.material_name }} ({{ material.unit }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="material_amount">Amount:</label>
+            <input type="number" id="material_amount" min="1" step="0.01">
+        </div>
+
+        <div class="form-group">
+            <label>&nbsp;</label> <!-- Keeps height consistent -->
+            <button type="button" class="btn btn-primary" id="addItem">Add</button>
+        </div>
+    </div>
+</div>
+
+
+        <table class="table table-bordered mt-3" id="materialsTable">
+            <thead>
+                <tr>
+                    <th>Material</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+            <div class="flex-fill">
+            <label for="loading_unloading_charges" class="form-label">Loading Unloading Charges</label>
+            <input type="number" class="form-control" id="loading_unloading_charges" name="loading_unloading_charges" step="0.01">
+          </div>
+          <div class="flex-fill">
+            <label for="bill_amount" class="form-label">Bill Amount</label>
+            <input type="number" class="form-control" id="bill_amount" readonly value="0" name="bill_amount" step="0.01">
+          </div>
+          <div class="flex-fill">
+            <label for="note" class="form-label">Note</label>
+            <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="cgst9%" name="cgst_9">
+              <label class="form-check-label" for="cgst9%">
+                    CGST 9%
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="sgst9%" name="sgst_9">
+              <label class="form-check-label" for="sgst9%">
+                SGST 9%
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="cgst14%" name="cgst_14">
+              <label class="form-check-label" for="cgst14%">
+                CGST 14%
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="sgst14%" name="sgst_14">
+              <label class="form-check-label" for="sgst14%">
+                SGST 14%
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="igst18%" name="igst_18">
+              <label class="form-check-label" for="igst18%">
+                IGST 18%
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="1" id="extragst0.10%" name="extra_010">
+              <label class="form-check-label" for="extragst0.10%">
+                0.10%
+              </label>
+            </div>
+        </div>
+
+        <br><hr style="background: #0000ff; height: 3px"><br>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+        <label for="grand_total">Grand Total:</label>
+        <input class="form-control form-control-lg" type="number" id="grand_total" name="grand_total" required step="0.01">
+        </div>
+
+
+        <input type="hidden" name="material_data" id="material_data">
+
+        <div class="form-buttons">
+            <button type="submit">Submit</button>
+            <button type="reset" class="clear-btn">Clear</button>
+        </div>
+    </div>
+</form>
+
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const materials = JSON.parse("{{ materials_json|escapejs }}");
+
+        const qtyInput = document.getElementById("material_qty");
+        const materialSelect = document.getElementById("buyer_material_billing");
+        const amountInput = document.getElementById("material_amount");
+        const addButton = document.getElementById("addItem");
+        const loading_unloading_charges = document.getElementById("loading_unloading_charges");
+        const billAmountField = document.getElementById("bill_amount");
+        const materialsTableBody = document.querySelector("#materialsTable tbody");
+        const hiddenMaterialDataInput = document.getElementById("material_data");
+
+        let totalBill = 0;
+        let materialQuantities = {};
+        let addedMaterials = [];
+
+        function updateAmount() {
+            const qty = parseFloat(qtyInput.value);
+            const selectedMaterialId = parseInt(materialSelect.value);
+            const selectedMaterial = materials.find(mat => mat.id === selectedMaterialId);
+
+            if (selectedMaterial && qty) {
+                const calculatedAmount = qty * selectedMaterial.price_per_unit;
+                amountInput.value = calculatedAmount.toFixed(2);
+            } else {
+                amountInput.value = '';
+            }
+        }
+
+        qtyInput.addEventListener("input", updateAmount);
+        materialSelect.addEventListener("change", updateAmount);
+
+        addButton.addEventListener("click", function () {
+            const selectedMaterialId = parseInt(materialSelect.value);
+            const selectedMaterial = materials.find(mat => mat.id === selectedMaterialId);
+            const quantity = parseFloat(qtyInput.value);
+
+            if (!selectedMaterial || !quantity) {
+                alert("Please fill all fields correctly.");
+                return;
+            }
+
+            const currentQty = materialQuantities[selectedMaterialId] || 0;
+            const newTotalQty = currentQty + quantity;
+
+            if (selectedMaterial.available_qty === 0 || newTotalQty > selectedMaterial.available_qty) {
+                const sameUnitMaterials = materials.filter(
+                    mat => mat.unit === selectedMaterial.unit && mat.available_qty > 0
+                );
+
+                let message = `The selected material "${selectedMaterial.material_name}" exceeds available stock.\n\n`;
+
+                if (sameUnitMaterials.length > 0) {
+                    const cheaper = sameUnitMaterials.reduce((min, m) => m.price_per_unit < min.price_per_unit ? m : min, sameUnitMaterials[0]);
+                    const costlier = sameUnitMaterials.reduce((max, m) => m.price_per_unit > max.price_per_unit ? m : max, sameUnitMaterials[0]);
+
+                    message += `👉 Cheaper alternative: ${cheaper.material_name} - ₹${cheaper.price_per_unit}/${cheaper.unit}\n`;
+                    message += `👉 Costlier alternative: ${costlier.material_name} - ₹${costlier.price_per_unit}/${costlier.unit}`;
+                } else {
+                    message += `No alternatives found.`;
+                }
+
+                alert(message);
+                return;
+            }
+
+            const amount = quantity * selectedMaterial.price_per_unit;
+
+            const row = document.createElement("tr");
+            row.setAttribute('data-material-id', selectedMaterialId);
+            row.setAttribute('data-qty', quantity);
+            row.innerHTML = `
+                <td>${selectedMaterial.material_name}</td>
+                <td>${quantity} ${selectedMaterial.unit}</td>
+                <td class="row-amount">${amount.toFixed(2)}</td>
+                <td><button type="button" class="btn-close remove-item btn-warning" aria-label="Remove"></button></td>
+            `;
+            materialsTableBody.appendChild(row);
+
+            materialQuantities[selectedMaterialId] = newTotalQty;
+            totalBill += amount;
+            billAmountField.value = totalBill.toFixed(2);
+
+            addedMaterials.push({
+                buyer_material_material: selectedMaterialId,
+                material_qty: quantity,
+                amount: amount
+            });
+
+            hiddenMaterialDataInput.value = JSON.stringify(addedMaterials);
+
+            qtyInput.value = "";
+            amountInput.value = "";
+
+
+        });
+
+        materialsTableBody.addEventListener("click", function (e) {
+            if (e.target.classList.contains("remove-item")) {
+                const row = e.target.closest("tr");
+                const materialId = parseInt(row.getAttribute("data-material-id"));
+                const qty = parseFloat(row.getAttribute("data-qty"));
+                const amount = parseFloat(row.querySelector(".row-amount").textContent);
+
+                materialQuantities[materialId] -= qty;
+                totalBill -= amount;
+                billAmountField.value = totalBill.toFixed(2);
+
+                addedMaterials = addedMaterials.filter(
+                    item => !(item.material_id === materialId && item.qty === qty && item.amount === amount)
+                );
+                hiddenMaterialDataInput.value = JSON.stringify(addedMaterials);
+
+                row.remove();
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const gstCheckboxes = document.querySelectorAll(".form-check-input");
+        const billAmountInput = document.getElementById("bill_amount");
+        const grandTotalInput = document.getElementById("grand_total");
+
+        const gstRates = {
+            cgst_9: 9,
+            sgst_9: 9,
+            cgst_14: 14,
+            sgst_14: 14,
+            igst_18: 18,
+            extra_010: 0.10
+        };
+
+        function calculateGSTTotal() {
+            const billAmount = parseFloat(billAmountInput.value) || 0;
+            let gstTotal = 0;
+
+            for (const checkbox of gstCheckboxes) {
+                if (checkbox.checked && gstRates[checkbox.name] !== undefined) {
+                    gstTotal += (billAmount * gstRates[checkbox.name]) / 100;
+                }
+            }
+
+            grandTotalInput.value = (billAmount + gstTotal).toFixed(2);
+        }
+
+        // Recalculate on checkbox or bill amount change
+        gstCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", calculateGSTTotal);
+        });
+
+        billAmountInput.addEventListener("input", calculateGSTTotal);
+
+        // Optional: trigger once on load if bill is pre-filled
+        calculateGSTTotal();
+    });
+</script>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const materialTableBody = document.querySelector('#materialsTable tbody');
+    const billAmountInput = document.getElementById('bill_amount');
+    const loadingUnloadingInput = document.getElementById('loading_unloading_charges');
+
+    function getMaterialTotal() {
+        let total = 0;
+        materialTableBody.querySelectorAll('tr').forEach(row => {
+            const amountCell = row.querySelector('td:nth-child(3)');
+            if (amountCell) {
+                const text = amountCell.textContent.trim();
+                const value = parseFloat(text);
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            }
+        });
+        return total;
+    }
+
+    function calculateBillAmount() {
+        const materialTotal = getMaterialTotal();
+        const loadingCharges = parseFloat(loadingUnloadingInput.value) || 0;
+        const finalBill = materialTotal + loadingCharges;
+        billAmountInput.value = finalBill.toFixed(2);
+    }
+
+    // Update bill whenever loading/unloading charge changes
+    loadingUnloadingInput.addEventListener('input', calculateBillAmount);
+
+    // Optional: if you have a dynamic material table update, recalculate after DOM change
+    const observer = new MutationObserver(() => {
+        calculateBillAmount();
+    });
+    observer.observe(materialTableBody, { childList: true, subtree: true });
+
+    // Initial calculation
+    calculateBillAmount();
+});
+</script>
+
+
+</body>
+</html>

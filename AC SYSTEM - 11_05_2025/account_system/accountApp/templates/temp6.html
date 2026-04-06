@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp6 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Details and Advance</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("{% static 'Picture2.png' %}"); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .vendor-details-container,
+        .billing-blocks-container,
+        .form-section-container {
+            margin: 30px 30px 30px 30px;
+            padding: 15px;
+            background: rgba(245, 245, 245, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .vendor-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+
+        .vendor-details div {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .billing-blocks {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .billing-block {
+            background: linear-gradient(135deg, #007bff, #66aaff);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .billing-block span {
+            font-weight: bold;
+            font-size: 28px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-section .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #007bff;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: none;
+        }
+
+        .form-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-buttons button:hover {
+            background: #0056b3;
+        }
+
+        .form-buttons .clear-btn {
+            background: #6c757d;
+        }
+
+        .form-buttons .clear-btn:hover {
+            background: #494f54;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            color: #000000;
+        }
+
+        th {
+            background-color: #f9f9f9;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .modal-close {
+            background: #6c757d;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-light" style="background: rgba(255, 255, 255, 0.9); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <a class="navbar-brand" href="#">
+        <img src="{% static '2.png' %}" width="150" height="40" alt="Sai Vaibhav Traders Logo" style="margin-left:20px">
+      </a>
+      <form class="form-inline">
+        <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="history.back()">Back</button>
+        <button type="button" class="btn btn-light" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+      </form>
+    </nav>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show right-alert" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    
+        <div class="vendor-details-container">
+            <div class="vendor-details">
+                <div>Vendor No: {{ data.id }}</div>
+                <div>Vendor Name: {{ data.firstname }} {{ data.lastname }}</div>
+                <div>Vendor Mobile No: {{ data.mobile_no }}</div>
+                <div>Vendor Email: {{ data.email }}</div>
+                <div>Firm Name: {{ data.firm_name }}</div>
+                <div>Firm Address: {{ data.firm_address }}</div>
+                <div>Firm GST No: {{ data.firm_gst_no }}</div>
+            </div>
+        </div>
+
+        <div class="billing-blocks-container">
+            <div class="billing-blocks">
+                <div class="billing-block">
+                    Bill Amount
+                    <span id="billAmount">₹{{ mid_data.bill|floatformat:2 }}</span>
+                </div>
+                <div class="billing-block">
+                    Advance
+                    <span id="advanceAmount">₹{{ mid_data.adv|floatformat:2 }}</span>
+                </div>
+                <div class="billing-block">
+                    Remaining Amount
+                    <span id="remainingAmount">₹{{ mid_data.rem|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <form action="{% url 'vendor_advance' %}" method="POST">
+            {% csrf_token %}
+        <div class="form-section-container">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="vendor_advance_billing">Bill No:</label>
+                    <input type="number" id="vendor_advance_billing" name="vendor_advance_billing" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="type">Payment Type:</label>
+                    <select id="type" name="type">
+                        <option value="Cash">Cash</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="NEFT">NEFT</option>
+                        <option value="RTGS">RTGS</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="type_no">Payment No:</label>
+                    <input type="text" id="type_no" name="type_no">
+                </div>
+                <div class="form-group">
+                    <label for="adv_amount">Advance Amount:</label>
+                    <input type="number" id="adv_amount" name="adv_amount" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="note">Note:</label>
+                    <textarea id="note" name="note" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit">Submit</button>
+                <button type="reset" class="clear-btn">Clear</button>
+                <button type="button" class="clear-btn" onclick="showBills()">Pending Bills</button>
+            </div>
+        </div>
+        </form>
+
+    <!-- Modal for Bill Details -->
+    <div class="modal" id="billModal">
+        <div class="modal-content">
+            <h2>Bill Details</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Bill Amount</th>
+                        <th>Material</th>
+                        <th>Remaining Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="billDetailsTable">
+                    <!-- Details will be populated dynamically -->
+                </tbody>
+            </table>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+    const vbs = JSON.parse("{{vbs|escapejs}}");
+
+    // Show modal with bill details
+    function showBills() {
+
+        if (vbs) {
+            billDetailsTable.innerHTML = '';
+
+            vbs.forEach(v => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${v.bill_id}</td>
+                    <td>₹${parseFloat(v.bill_amount).toFixed(2)}</td>
+                    <td>${v.material_name}</td>
+                    <td>₹${parseFloat(v.remaining_amount).toFixed(2)}</td>
+                `;
+                billDetailsTable.appendChild(row);
+            });
+
+            billModal.style.display = 'flex';
+        }
+    }
+
+    // Close the modal
+    function closeModal() {
+        billModal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+            const modal = document.getElementById('billModal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        };
+
+</script>
+
+</body>
+</html>

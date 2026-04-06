@@ -1,0 +1,290 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp10 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Buyer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'Picture4.png' %}"); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+        }
+
+        .header.hidden {
+            display: none;
+        }
+
+        .logo {
+            width: 150px;
+            height: 40px;
+            background-color: #ddd; /* Placeholder for logo */
+            /* border-radius: 50%; */
+            margin-left: 20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .header-btn:hover {
+            background: #0056b3;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .container {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .buyer-details-container,
+        .billing-blocks-container,
+        .form-section-container {
+            margin-top: 100px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(245, 245, 245, 0.5);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .buyer-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+
+        .buyer-details div {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .billing-blocks {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .billing-block {
+            background: linear-gradient(135deg, #007bff, #66aaff);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
+            font-size: 18px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .billing-block span {
+            font-weight: bold;
+            font-size: 28px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-section .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #007bff;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: none;
+        }
+
+        .form-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-buttons button:hover {
+            background: #0056b3;
+        }
+
+        .form-buttons .clear-btn {
+            background: #6c757d;
+        }
+
+        .form-buttons .clear-btn:hover {
+            background: #494f54;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="{% static '2.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="header-buttons">
+            <button class="header-btn" onclick="history.back()">Back</button>
+            <button class="header-btn" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+        </div>
+    </header>
+
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show right-alert" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+
+    <div class="form-section-container">
+        <form action="{% url 'create_buyer' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="firstname">First Name:</label>
+                    <input type="text" id="firstname" name="firstname" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastname">Last Name:</label>
+                    <input type="text" id="lastname" name="lastname" required>
+                </div>
+                <div class="form-group">
+                    <label for="mobile_no">Mobile Number:</label>
+                    <input type="tel" id="mobile_no" name="mobile_no" pattern="[0-9]{10}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="firm_name">Firm Name:</label>
+                    <input type="text" id="firm_name" name="firm_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="firm_gst_no">Firm GST No:</label>
+                    <input type="text" id="firm_gst_no" name="firm_gst_no" required>
+                </div>
+                <div class="form-group">
+                    <label for="firm_address">Firm Address:</label>
+                    <textarea id="firm_address" name="firm_address" rows="3" required></textarea>
+                </div>
+                <input type="hidden" name="status" value="True">
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit">Submit</button>
+                <button type="reset" class="clear-btn">Clear</button>
+            </div>
+            </form>
+        </div>
+
+    <div class="placeholder-content">
+        <p>Welcome to the Buyer Management Screen</p>
+        <p>Please enter the required details in the fields above.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

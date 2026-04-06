@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp2 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer and Guest Input</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'Picture11.svg' %}"); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+        }
+
+        .header.hidden {
+            display: none;
+        }
+
+        .logo {
+            width: 150px;
+            height: 40px;
+            background-color: #ddd; /* Placeholder for logo */
+            /* border-radius: 50%; */
+            margin-left: 20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .header-btn:hover {
+            background: #0056b3;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .input-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="{% static '2.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="header-buttons">
+            <button class="header-btn" onclick="history.back()">Back</button>
+            <button class="header-btn" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+        </div>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show right-alert" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <form action="{% url 'index' %}" method="POST">
+        {% csrf_token %}
+    <div class="input-container">
+        <div class="form-group">
+            <label for="buyerNo">Buyer No</label>
+            <input type="number" id="buyerNo" name="buyerNo" placeholder="Enter Buyer No" min="1">
+        </div>
+        <div class="form-group">
+            <label for="guestName">Guest Name</label>
+            <input type="text" id="guestName" name="guestName" placeholder="Enter Guest Name">
+        </div>
+        <div class="form-group">
+            <label for="vendorNo">Vendor No</label>
+            <input type="number" id="vendorNo" name="vendorNo" placeholder="Enter Vendor No" min="1">
+        </div>
+    </div>
+    <button class="btn" type="submit" value="Billing" name="action">Billing</button>
+    <button class="btn" type="submit" value="Advance" name="action">Advance</button>
+    </form>
+    <div class="placeholder-content">
+        <p>Welcome to the Buyer, Guest, and Vendor Management Screen</p>
+        <p>Please enter the required details in the fields above.</p>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

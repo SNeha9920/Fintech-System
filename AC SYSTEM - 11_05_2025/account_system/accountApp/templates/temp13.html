@@ -1,0 +1,612 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- temp13 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Statement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url("{% static '937144.jpg' %}"); /* Replace with your image path */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .right-alert {
+          position: absolute;
+          right: 20px;
+          top: 70px;
+        }
+
+        .icon-size {
+            font-size: 4rem;
+        }
+
+        .gradient-icon {
+          background: linear-gradient(to right, #8e2de2, #4a00e0); /* Purple to blue gradient */
+          -webkit-background-clip: text;
+          color: transparent;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #007bff;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            background: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: none;
+        }
+
+        .form-buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .form-buttons button {
+            padding: 8px 17px;
+            border: none;
+            border-radius: 6px;
+            background: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-buttons button:hover {
+            background: #0056b3;
+        }
+
+        .form-buttons .clear-btn {
+            background: #6c757d;
+        }
+
+        .form-buttons .clear-btn:hover {
+            background: #494f54;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background: linear-gradient(to left, #8e2de2, #4a00e0); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <a class="navbar-brand" href="#">
+        <img src="{% static '2.png' %}" width="150" height="40" alt="Sai Vaibhav Traders Logo" style="margin-left:20px">
+      </a>
+      <form class="form-inline">
+        <button type="button" class="btn btn-secondary" style="margin-right: 10px;" onclick="history.back()">Back</button>
+        <button type="button" class="btn btn-light" onclick="window.location.href='{% url 'logout' request.session.userobj.id %}'">Logout</button>
+      </form>
+    </nav>
+
+
+    <div class="container mt-5 mb-5">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+
+        <div class="col">
+            <div class="card">
+              <div class="card-header text-center">
+                Select Month and Year
+              </div>
+                  <div class="card-body text-center">
+                     <form action="{% url 'gst_stat' %}" method="POST">
+                      {% csrf_token %}
+                    <div class="form-group">
+                        <label for="date"><h5>Date:</h5></label>
+                        <br>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-buttons">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                    <button class="btn btn-primary" style="background:#6c757d" type="reset">Clear</button>
+                    </div>
+                     </form>
+                  </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+              <div class="card-header text-center">
+                Purchase GST Statement
+              </div>
+
+                  <div class="card-body text-center">
+                    <i class="bi bi-box2 icon-size gradient-icon"></i><br>
+                    <button class="btn btn-info" onclick="showPurchaseGSTStatement()">Purchase GST Statement</button>
+                      <button class="btn btn-warning" onclick="closeBox()">Close</button>
+                  </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+              <div class="card-header text-center">
+                Sales GST Statement
+              </div>
+
+                  <div class="card-body text-center">
+                    <i class="bi bi-cart4 icon-size gradient-icon"></i><br>
+                    <button class="btn btn-info" onclick="showSalesGSTStatement()">Sales GST Statement</button>
+                      <button class="btn btn-warning" onclick="closeBox()">Close</button>
+                  </div>
+            </div>
+        </div>
+
+
+    </div>
+    </div>
+
+
+    <div id="billBox" class="container" style="display:none;">
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+    const purchase_bills = JSON.parse("{{purchase_bills|escapejs}}");
+    const sales_bills = JSON.parse("{{sales_bills|escapejs}}");
+    const purchase_unit_totals = JSON.parse("{{purchase_unit_totals|escapejs}}");
+    const sales_unit_totals = JSON.parse("{{sales_unit_totals|escapejs}}");
+    const purchase_summary = JSON.parse("{{purchase_summary|escapejs}}");
+    const sales_summary = JSON.parse("{{sales_summary|escapejs}}");
+
+    console.log(purchase_bills);
+    console.log(sales_bills);
+    console.log(purchase_unit_totals);
+    console.log(sales_unit_totals);
+    console.log(purchase_summary);
+    console.log(sales_summary);
+
+    const unitTotalsDisplayPurchase = Object.entries(purchase_unit_totals)
+    .map(([unit, qty]) => `${qty} ${unit}`)
+    .join('<br>');
+
+    const unitTotalsDisplaySales = Object.entries(sales_unit_totals)
+    .map(([unit, qty]) => `${qty} ${unit}`)
+    .join('<br>');
+
+
+
+    function showPurchaseGSTStatement() {
+        let billBox = document.getElementById('billBox');
+        billBox.style.display = 'block';
+        billBox.innerHTML = generatePurchaseGSTTable(purchase_bills);
+    }
+
+    function showSalesGSTStatement() {
+        let billBox = document.getElementById('billBox');
+        billBox.style.display = 'block';
+        billBox.innerHTML = generateSalesGSTTable(sales_bills);
+    }
+
+    function generatePurchaseGSTTable(data) {
+        if (!data || data.length === 0) {
+            return `<div class="alert alert-warning text-center">No Purchase GST records available.</div>`;
+        }
+
+        let totalBillAmount = 0;
+        let totalCGST9 = 0;
+        let totalSGST9 = 0;
+        let totalCGST14 = 0;
+        let totalSGST14 = 0;
+        let totalIGST18 = 0;
+        let totalExtra010 = 0;
+        let totalGrandTotal = 0;
+
+        let tableHTML = `
+            <div class="container mt-4 p-3 rounded" id="gst-print-area" style="background-color: #f8f9fa;">
+            <div class="d-flex justify-content-end mb-2">
+            <button class="btn btn-light btn-outline-primary" onclick="printGSTStatement()">🖨️ Print</button>
+            </div>
+            <h3 class="text-center"><b>SAI VAIBHAV TRADERS</b></h3>
+            <h4 class="text-center">GST WORKING</h4>
+            <h4 class="text-center">DATE</h4>
+            <h4 class="text-center">PURCHASE</h4>
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th><u>#</u></th>
+                        <th><u>DATE</u></th>
+                        <th><u>BILL NO</u></th>
+                        <th><u>NAME OF PARTY</u></th>
+                        <th><u>GOODS NAME</u></th>
+                        <th><u>GST NO</u></th>
+                        <th><u>HSN CODE</u></th>
+                        <th><u>QTY / WEIGHT</u></th>
+                        <th><u>UNIT</u></th>
+                        <th><u>NET AMT.</u></th>
+                        <th><u>CGST 9%</u></th>
+                        <th><u>SGST 9%</u></th>
+                        <th><u>CGST 14%</u></th>
+                        <th><u>SGST 14%</u></th>
+                        <th><u>IGST 18%</u></th>
+                        <th><u>0.10%</u></th>
+                        <th><u>TOTAL</u></th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.forEach((bill, index) => {
+            const materialNames = bill.materials.map(m => m.material_name).join(',<br>');
+            const hsnCodes = bill.materials.map(m => m.hsn_code).join(',<br>');
+            const materialQtys = bill.materials.map(m => m.material_qty).join(',<br>');
+            const materialUnits = bill.materials.map(m => m.unit).join(',<br>');
+
+            const billAmount = parseFloat(bill.bill_amount) || 0;
+            const cgst9 = bill.cgst_9 ? billAmount * 0.09 : 0;
+            const sgst9 = bill.sgst_9 ? billAmount * 0.09 : 0;
+            const cgst14 = bill.cgst_14 ? billAmount * 0.14 : 0;
+            const sgst14 = bill.sgst_14 ? billAmount * 0.14 : 0;
+            const igst18 = bill.igst_18 ? billAmount * 0.18 : 0;
+            const extra010 = bill.extra_010 ? billAmount * 0.001 : 0;
+            const grandTotal = parseFloat(bill.grand_total) || 0;
+
+            totalBillAmount += billAmount;
+            totalCGST9 += cgst9;
+            totalSGST9 += sgst9;
+            totalCGST14 += cgst14;
+            totalSGST14 += sgst14;
+            totalIGST18 += igst18;
+            totalExtra010 += extra010;
+            totalGrandTotal += grandTotal;
+
+            tableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${bill.date || ''}</td>
+                    <td>${bill.id || ''}</td>
+                    <td>${bill.vendor.firm_name || ''}</td>
+                    <td>${materialNames || ''}</td>
+                    <td>${bill.vendor.firm_gst_no || ''}</td>
+                    <td>${hsnCodes || ''}</td>
+                    <td>${materialQtys || ''}</td>
+                    <td>${materialUnits || ''}</td>
+                    <td>${billAmount.toFixed(2)}</td>
+                    <td>${cgst9.toFixed(2)}</td>
+                    <td>${sgst9.toFixed(2)}</td>
+                    <td>${cgst14.toFixed(2)}</td>
+                    <td>${sgst14.toFixed(2)}</td>
+                    <td>${igst18.toFixed(2)}</td>
+                    <td>${extra010.toFixed(2)}</td>
+                    <td>${grandTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        tableHTML += `
+
+                  <tr class="table-warning">
+                    <td colspan="9" class="text-end"><strong>Total ${unitTotalsDisplayPurchase}</strong></td>
+                    <td><strong>${totalBillAmount.toFixed(2)}</strong></td>
+                    <td><strong>${totalCGST9.toFixed(2)}</strong></td>
+                    <td><strong>${totalSGST9.toFixed(2)}</strong></td>
+                    <td><strong>${totalCGST14.toFixed(2)}</strong></td>
+                    <td><strong>${totalSGST14.toFixed(2)}</strong></td>
+                    <td><strong>${totalIGST18.toFixed(2)}</strong></td>
+                    <td><strong>${totalExtra010.toFixed(2)}</strong></td>
+                    <td><strong>${totalGrandTotal.toFixed(2)}</strong></td>
+                  </tr>
+
+                  <!--<tr>
+                    <td></td>
+                    <td>date</td>
+                    <td>id</td>
+                    <td>Abm & Associates LLP</td>
+                    <td>Audit</td>
+                    <td>30AATFA6648MZZ</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>2880.00</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>18880.00</td>
+                </tr>-->
+                </tbody>
+            </table>
+            </div>
+        `;
+
+        if (purchase_summary && Object.keys(purchase_summary).length > 0) {
+        let unitTotals = {};
+        let totalAmount = 0;
+        let srNo = 1;
+
+        tableHTML += `
+        <h4 class="text-center mt-4">PURCHASE SUMMARY</h4>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-success">
+                <tr>
+                    <th>SR.NO.</th>
+                    <th>ITEMS</th>
+                    <th>UNIT</th>
+                    <th>QTY</th>
+                    <th>AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        Object.values(purchase_summary).forEach(([qty, amount, name, unit]) => {
+            tableHTML += `
+                <tr>
+                    <td>${srNo}</td>
+                    <td>${name}</td>
+                    <td>${unit}</td>
+                    <td>${qty.toFixed(3)}</td>
+                    <td>${amount.toFixed(2)}</td>
+                </tr>
+            `;
+            if (!unitTotals[unit]) {
+                unitTotals[unit] = 0;
+            }
+            unitTotals[unit] += qty;
+
+            totalAmount += amount;
+            srNo++;
+        });
+
+        for (const [unit, totalQty] of Object.entries(unitTotals)) {
+        tableHTML += `
+            <tr class="table-warning">
+                <td colspan="2" class="text-end"><strong>Total (${unit})</strong></td>
+                <td>${unit}</td>
+                <td><strong>${totalQty.toFixed(3)}</strong></td>
+                <td></td>
+            </tr>
+        `;
+    }
+
+        tableHTML += `
+            <tr class="table-warning">
+            <td colspan="4" class="text-end"><strong>Grand Total Amount</strong></td>
+            <td><strong>${totalAmount.toFixed(2)}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+        `;
+    }
+
+    tableHTML += `</div>`; // closing outer container
+
+    return tableHTML;
+}
+
+
+    function generateSalesGSTTable(data) {
+        if (!data || data.length === 0) {
+            return `<div class="alert alert-warning text-center">No Sales GST records available.</div>`;
+        }
+
+        let totalBillAmount = 0;
+        let totalCGST9 = 0;
+        let totalSGST9 = 0;
+        let totalCGST14 = 0;
+        let totalSGST14 = 0;
+        let totalIGST18 = 0;
+        let totalExtra010 = 0;
+        let totalGrandTotal = 0;
+
+        let tableHTML = `
+            <div class="container mt-4 p-3 rounded" id="gst-print-area" style="background-color: #f8f9fa;">
+            <div class="d-flex justify-content-end mb-2">
+            <button class="btn btn-light btn-outline-primary" onclick="printGSTStatement()">🖨️ Print</button>
+            </div>
+            <h3 class="text-center"><b>SAI VAIBHAV TRADERS</b></h3>
+            <h4 class="text-center">GST WORKING</h4>
+            <h4 class="text-center">DATE</h4>
+            <h4 class="text-center">SALES</h4>
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th><u>#</u></th>
+                        <th><u>DATE</u></th>
+                        <th><u>BILL NO</u></th>
+                        <th><u>NAME OF PARTY</u></th>
+                        <th><u>GOODS NAME</u></th>
+                        <th><u>GST NO</u></th>
+                        <th><u>HSN CODE</u></th>
+                        <th><u>QTY / WEIGHT</u></th>
+                        <th><u>UNIT</u></th>
+                        <th><u>NET 18%</u></th>
+                        <th><u>CGST 9%</u></th>
+                        <th><u>SGST 9%</u></th>
+                        <th><u>CGST 14%</u></th>
+                        <th><u>SGST 14%</u></th>
+                        <th><u>IGST 18%</u></th>
+                        <th><u>TOTAL</u></th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.forEach((bill, index) => {
+        const materialNames = bill.materials.map(m => m.material_name).join(',<br>');
+        const hsnCodes = bill.materials.map(m => m.hsn_code).join(',<br>');
+        const materialQtys = bill.materials.map(m => m.material_qty).join(',<br>');
+        const materialUnits = bill.materials.map(m => m.unit).join(',<br>');
+
+        const billAmount = parseFloat(bill.bill_amount) || 0;
+        const cgst9 = bill.cgst_9 ? billAmount * 0.09 : 0;
+        const sgst9 = bill.sgst_9 ? billAmount * 0.09 : 0;
+        const cgst14 = bill.cgst_14 ? billAmount * 0.14 : 0;
+        const sgst14 = bill.sgst_14 ? billAmount * 0.14 : 0;
+        const igst18 = bill.igst_18 ? billAmount * 0.18 : 0;
+        const grandTotal = parseFloat(bill.grand_total) || 0;
+
+        totalBillAmount += billAmount;
+        totalCGST9 += cgst9;
+        totalSGST9 += sgst9;
+        totalCGST14 += cgst14;
+        totalSGST14 += sgst14;
+        totalIGST18 += igst18;
+        totalGrandTotal += grandTotal;
+
+            tableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${bill.date || ''}</td>
+                    <td>${bill.id || ''}</td>
+                    <td>${bill.buyer.firm_name || bill.buyer_name}</td>
+                    <td>${materialNames || ''}</td>
+                    <td>${bill.buyer.firm_gst_no || ''}</td>
+                    <td>${hsnCodes || ''}</td>
+                    <td>${materialQtys || ''}</td>
+                    <td>${materialUnits || ''}</td>
+                    <td>${billAmount.toFixed(2)}</td>
+                    <td>${cgst9.toFixed(2)}</td>
+                    <td>${sgst9.toFixed(2)}</td>
+                    <td>${cgst14.toFixed(2)}</td>
+                    <td>${sgst14.toFixed(2)}</td>
+                    <td>${igst18.toFixed(2)}</td>
+                    <td>${grandTotal.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        tableHTML += `
+
+                  <tr class="table-warning">
+                    <td colspan="9" class="text-end"><strong>Total ${unitTotalsDisplaySales}</strong></td>
+                    <td><strong>${totalBillAmount.toFixed(2)}</strong></td>
+                    <td><strong>${totalCGST9.toFixed(2)}</strong></td>
+                    <td><strong>${totalSGST9.toFixed(2)}</strong></td>
+                    <td><strong>${totalCGST14.toFixed(2)}</strong></td>
+                    <td><strong>${totalSGST14.toFixed(2)}</strong></td>
+                    <td><strong>${totalIGST18.toFixed(2)}</strong></td>
+                    <td><strong>${totalGrandTotal.toFixed(2)}</strong></td>
+                  </tr>
+                </tbody>
+            </table>
+            </div>
+        `;
+
+
+        if (sales_summary && Object.keys(sales_summary).length > 0) {
+        let unitTotals = {};
+        let totalAmount = 0;
+        let srNo = 1;
+
+        tableHTML += `
+        <h4 class="text-center mt-4">SALES SUMMARY</h4>
+        <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-success">
+                <tr>
+                    <th>SR.NO.</th>
+                    <th>ITEMS</th>
+                    <th>UNIT</th>
+                    <th>QTY</th>
+                    <th>AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        Object.values(sales_summary).forEach(([qty, amount, name, unit]) => {
+            tableHTML += `
+                <tr>
+                    <td>${srNo}</td>
+                    <td>${name}</td>
+                    <td>${unit}</td>
+                    <td>${qty.toFixed(3)}</td>
+                    <td>${amount.toFixed(2)}</td>
+                </tr>
+            `;
+            if (!unitTotals[unit]) {
+                unitTotals[unit] = 0;
+            }
+            unitTotals[unit] += qty;
+
+            totalAmount += amount;
+            srNo++;
+        });
+
+        for (const [unit, totalQty] of Object.entries(unitTotals)) {
+        tableHTML += `
+            <tr class="table-warning">
+                <td colspan="2" class="text-end"><strong>Total (${unit})</strong></td>
+                <td>${unit}</td>
+                <td><strong>${totalQty.toFixed(3)}</strong></td>
+                <td></td>
+            </tr>
+        `;
+    }
+
+        tableHTML += `
+             <tr class="table-warning">
+            <td colspan="4" class="text-end"><strong>Grand Total Amount</strong></td>
+            <td><strong>${totalAmount.toFixed(2)}</strong></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+        `;
+    }
+
+    tableHTML += `</div>`; // closing outer container
+
+    return tableHTML;
+}
+
+    function closeBox() {
+        const billBox = document.getElementById('billBox');
+        billBox.style.display = 'none';
+        billBox.innerHTML = ''; // Optional: clears the content
+    }
+
+    function printGSTStatement() {
+        const printContent = document.getElementById('gst-print-area').innerHTML;
+        const originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        location.reload(); // optional: reload the page to restore event handlers
+    }
+
+    </script>
+
+</body>
+</html>

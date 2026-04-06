@@ -1,0 +1,49 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="12">
+            <item index="0" class="java.lang.String" itemvalue="psycopg2" />
+            <item index="1" class="java.lang.String" itemvalue="asgiref" />
+            <item index="2" class="java.lang.String" itemvalue="et-xmlfile" />
+            <item index="3" class="java.lang.String" itemvalue="requests" />
+            <item index="4" class="java.lang.String" itemvalue="sqlparse" />
+            <item index="5" class="java.lang.String" itemvalue="django-filter" />
+            <item index="6" class="java.lang.String" itemvalue="Django" />
+            <item index="7" class="java.lang.String" itemvalue="certifi" />
+            <item index="8" class="java.lang.String" itemvalue="pytz" />
+            <item index="9" class="java.lang.String" itemvalue="urllib3" />
+            <item index="10" class="java.lang.String" itemvalue="djangorestframework" />
+            <item index="11" class="java.lang.String" itemvalue="django-cors-headers" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E501" />
+          <option value="W292" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="input" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="django.contrib.messages.storage.session.delete" />
+          <option value="RMR.RMR.urls.RMRapp" />
+          <option value="datetime.timezone.now" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
