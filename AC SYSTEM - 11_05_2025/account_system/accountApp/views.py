@@ -61,7 +61,7 @@ def DeviceChecker(func):
     """Decorator to verify the processor ID before running the decorated function."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        expected_processor_id = 'BFEBFBFF000806C1'  # Hardcoded expected processor ID
+        expected_processor_id = ''  # Hardcoded expected processor ID
         target_datetime = datetime(2026, 6, 6, 0, 0, 0)
         current_datetime = datetime.now()
         actual_processor_id = get_processor_id()
